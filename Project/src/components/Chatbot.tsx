@@ -52,9 +52,9 @@ export function Chatbot() {
     const userMsg: Message = { id: Date.now().toString(), sender: 'user', text: option };
     setMessages((prev) => [...prev, userMsg]);
 
-    let nextData = { ...userData };
-    let nextStep = step + 1;
-    let nextBotMsgs: Message[] = [];
+    const nextData = { ...userData };
+    const nextStep = step + 1;
+    const nextBotMsgs: Message[] = [];
 
     if (step === 0) {
       nextData.gender = option;

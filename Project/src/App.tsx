@@ -153,7 +153,7 @@ export default function App() {
   };
 
   // Match Action - Confirm Proposal Send
-  const handleSendProposalSuccess = (_introText: string) => {
+  const handleSendProposalSuccess = () => {
     if (!selectedClientId || !activeProposal) return;
     
     const clientId = selectedClientId;
