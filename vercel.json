@@ -1,0 +1,6 @@
+{
+  "framework": "vite",
+  "buildCommand": "cd Project && npm install && npm run build",
+  "outputDirectory": "Project/dist",
+  "installCommand": "echo 'Dependencies are installed during the build command'"
+}
