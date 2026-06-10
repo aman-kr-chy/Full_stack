@@ -3,6 +3,8 @@ import { X, Send, Sparkles, Loader2, Mail } from 'lucide-react';
 import type { Profile, ClientProfile } from '../types';
 import { generateEmailProposal } from '../services/ai';
 
+import emailjs from '@emailjs/browser';
+
 interface ProposalModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -47,22 +49,32 @@ export const ProposalModal: React.FC<ProposalModalProps> = ({
   const handleSend = async () => {
     setLoading(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
-      const response = await fetch(`${apiUrl}/api/send-email`, {
-        method: "POST",
-        headers: { 
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-            to: "amanpc847101@gmail.com", // Sending to your email for testing instead of the fake client.email
-            subject: `Match Recommendation for ${client.firstName}`,
-            message: emailText,
-            fromName: matchmakerName
-        })
-      });
+      const serviceId = localStorage.getItem('emailjs_service_id');
+      const templateId = localStorage.getItem('emailjs_template_id');
+      const publicKey = localStorage.getItem('emailjs_public_key');
+
+      if (!serviceId || !templateId || !publicKey) {
+        alert("Please configure your EmailJS credentials in the Settings menu first.");
+        setLoading(false);
+        return;
+      }
+
+      const templateParams = {
+        to_name: `${client.firstName} ${client.lastName}`,
+        to_email: "amanpc847101@gmail.com", // Sending to your email for testing instead of client.email
+        from_name: matchmakerName,
+        subject: `Match Recommendation for ${client.firstName}`,
+        message: emailText,
+      };
+
+      const response = await emailjs.send(
+        serviceId,
+        templateId,
+        templateParams,
+        publicKey
+      );
       
-      if (response.ok) {
+      if (response.status === 200) {
         onSendSuccess(emailText);
       } else {
         alert("Failed to send automatically. Check console.");
