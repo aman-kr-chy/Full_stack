@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Heart, Settings, LogOut, ChevronLeft, ShieldCheck, Users, UserCheck, Moon, Sun } from 'lucide-react';
+import { Heart, Settings, LogOut, ChevronLeft, ShieldCheck, Users, UserCheck, Moon, Sun, Menu, X } from 'lucide-react';
 import type { ClientProfile, Profile } from './types';
 import { mockClients } from './data/mockClients';
 import { ClientList } from './components/ClientList';
 import { DetailView } from './components/DetailView';
 import { SettingsDrawer } from './components/SettingsDrawer';
 import { ProposalModal } from './components/ProposalModal';
+import { Chatbot } from './components/Chatbot';
 import { useTheme } from './context/ThemeContext';
 
 export default function App() {
@@ -25,6 +26,7 @@ export default function App() {
   // Modals & Drawers
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [activeProposal, setActiveProposal] = useState<{ match: Profile; score: number } | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Proposal sent records state (map of client ID -> array of match IDs)
   const [sentProposals, setSentProposals] = useState<{ [clientId: string]: string[] }>({});
@@ -251,8 +253,13 @@ export default function App() {
 
   return (
     <div className="app-shell">
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="mobile-menu-overlay" onClick={() => setIsMobileMenuOpen(false)} />
+      )}
+
       {/* Sidebar Navigation */}
-      <aside className="app-sidebar">
+      <aside className={`app-sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
         <div className="sidebar-top">
           <div className="sidebar-brand">
             <Heart size={20} fill="var(--color-primary)" className="logo-heart-icon" />
@@ -262,7 +269,10 @@ export default function App() {
             <li>
               <button 
                 className={`menu-item-btn ${!selectedClientId ? 'active' : ''}`}
-                onClick={() => setSelectedClientId(null)}
+                onClick={() => {
+                  setSelectedClientId(null);
+                  setIsMobileMenuOpen(false);
+                }}
               >
                 <Users size={16} />
                 Client Roster
@@ -277,7 +287,10 @@ export default function App() {
               </li>
             )}
             <li>
-              <button className="menu-item-btn" onClick={() => setIsSettingsOpen(true)}>
+              <button className="menu-item-btn" onClick={() => {
+                setIsSettingsOpen(true);
+                setIsMobileMenuOpen(false);
+              }}>
                 <Settings size={16} />
                 Configuration
               </button>
@@ -302,16 +315,22 @@ export default function App() {
         {/* Navigation / Header Bar */}
         <header className="app-header">
           <div className="header-title-area">
+            <button 
+              className="btn btn-secondary btn-icon-only mobile-menu-toggle"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
             {activeClient ? (
               <button className="btn btn-secondary btn-sm" onClick={() => setSelectedClientId(null)}>
                 <ChevronLeft size={14} className="btn-icon" />
                 Back to Client Roster
               </button>
             ) : (
-              <>
+              <div>
                 <h2>Matchmaker Dashboard</h2>
                 <p>Welcome back, {matchmakerName}. You are managing {clients.length} primary client accounts.</p>
-              </>
+              </div>
             )}
           </div>
           <div className="header-actions">
@@ -410,6 +429,9 @@ export default function App() {
           <span>{toastMessage}</span>
         </div>
       )}
+
+      {/* Advisor Chatbot Widget */}
+      <Chatbot />
     </div>
   );
 }

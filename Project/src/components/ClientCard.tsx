@@ -14,7 +14,7 @@ export const ClientCard: React.FC<ClientCardProps> = ({ client, isSelected, onSe
     'Profile Verification': 'stage-verification',
     'Searching Matches': 'stage-searching',
     'Intro Sent': 'stage-sent',
-    'First Date': 'stage-date',
+    'First Date': 'stage-date', 
     'Success': 'stage-success'
   };
 

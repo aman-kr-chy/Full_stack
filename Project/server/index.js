@@ -1,37 +1,17 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const connectDB = require('./config/db');
-const authRoutes = require('./routes/auth');
-const nodemailer = require('nodemailer');
+import express from 'express';
+import cors from 'cors';
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
-
-// Connect to MongoDB
-connectDB();
-
-// Middleware
-app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin || /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 
-// Routes
-app.use('/api/auth', authRoutes);
+const PORT = process.env.PORT || 3001;
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'Backend is running' });
-});
-
-// Email transporter
+// Validate ENV variables on start
 if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
   console.warn('WARNING: EMAIL_USER or EMAIL_PASS is missing in .env file!');
 }
@@ -44,7 +24,6 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Send Email Route
 app.post('/api/send-email', async (req, res) => {
   const { to, subject, message, fromName } = req.body;
 
@@ -68,7 +47,6 @@ app.post('/api/send-email', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on port ${PORT} (0.0.0.0)`);
+app.listen(PORT, () => {
+  console.log(`Backend server running on http://localhost:${PORT}`);
 });

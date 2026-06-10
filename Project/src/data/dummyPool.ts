@@ -134,8 +134,8 @@ const rng = new SeededRandom(2026);
 export function generateDummyPool(): Profile[] {
   const pool: Profile[] = [];
 
-  for (let i = 1; i <= 120; i++) {
-    const gender = i <= 60 ? 'Male' : 'Female';
+  for (let i = 1; i <= 200; i++) {
+    const gender = i <= 100 ? 'Male' : 'Female';
     const firstName = gender === 'Male' ? rng.pick(FIRST_NAMES_MALE) : rng.pick(FIRST_NAMES_FEMALE);
     const lastName = rng.pick(SURNAMES);
     

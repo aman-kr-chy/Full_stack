@@ -44,8 +44,34 @@ export const ProposalModal: React.FC<ProposalModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleSend = () => {
-    onSendSuccess(emailText);
+  const handleSend = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:5000/api/send-email", {
+        method: "POST",
+        headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            to: "amanpc847101@gmail.com", // Sending to your email for testing instead of the fake client.email
+            subject: `Match Recommendation for ${client.firstName}`,
+            message: emailText,
+            fromName: matchmakerName
+        })
+      });
+      
+      if (response.ok) {
+        onSendSuccess(emailText);
+      } else {
+        alert("Failed to send automatically. Check console.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert(`Error sending message: ${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
