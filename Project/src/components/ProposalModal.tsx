@@ -3,8 +3,6 @@ import { X, Send, Sparkles, Loader2, Mail } from 'lucide-react';
 import type { Profile, ClientProfile } from '../types';
 import { generateEmailProposal } from '../services/ai';
 
-import emailjs from '@emailjs/browser';
-
 interface ProposalModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -49,38 +47,32 @@ export const ProposalModal: React.FC<ProposalModalProps> = ({
   const handleSend = async () => {
     setLoading(true);
     try {
-      const serviceId = localStorage.getItem('emailjs_service_id');
-      const templateId = localStorage.getItem('emailjs_template_id');
-      const publicKey = localStorage.getItem('emailjs_public_key');
+      const toEmail = "amanpc847101@gmail.com"; // Hardcoded to your email for testing
 
-      if (!serviceId || !templateId || !publicKey) {
-        // Simulate email sending if credentials are not configured
-        console.warn("EmailJS credentials missing. Simulating email send...");
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        onSendSuccess(emailText);
-        setLoading(false);
-        return;
-      }
+      // Using FormSubmit for zero-config email sending
+      const response = await fetch(`https://formsubmit.co/ajax/${toEmail}`, {
+        method: "POST",
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          _subject: `Match Recommendation for ${client.firstName}`,
+          _template: 'box', // Clean email template
+          _replyto: client.email,
+          message: emailText
+        })
+      });
 
-      const templateParams = {
-        to_name: `${client.firstName} ${client.lastName}`,
-        to_email: "amanpc847101@gmail.com", // Sending to your email for testing instead of client.email
-        from_name: matchmakerName,
-        subject: `Match Recommendation for ${client.firstName}`,
-        message: emailText,
-      };
-
-      const response = await emailjs.send(
-        serviceId,
-        templateId,
-        templateParams,
-        publicKey
-      );
+      const result = await response.json();
       
-      if (response.status === 200) {
+      if (result.success === "true") {
         onSendSuccess(emailText);
+        // Note: First time only, they will need to click the activation link in their email
+        alert("Success! Check your email inbox. (Note: The first time, FormSubmit might send an activation link to verify your email).");
       } else {
         alert("Failed to send automatically. Check console.");
+        console.error(result);
       }
     } catch (error) {
       console.error(error);
