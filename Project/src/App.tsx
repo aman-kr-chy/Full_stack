@@ -16,7 +16,7 @@ export default function App() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
-  const [authToken, setAuthToken] = useState(() => localStorage.getItem('tdc_token') || null);
+  const [, setAuthToken] = useState(() => localStorage.getItem('tdc_token') || null);
 
   // App States
   const [clients, setClients] = useState<ClientProfile[]>([]);

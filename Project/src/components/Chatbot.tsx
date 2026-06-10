@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, User, Bot } from 'lucide-react';
 import { mockClients } from '../data/mockClients';
 
